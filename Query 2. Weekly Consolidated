@@ -1,0 +1,18 @@
+SELECT bb.id as bill_id,
+       ba.external_id as store_address_id,
+       iii.concept,
+       CAST(iii.base_amount / 100.0 AS DECIMAL(15, 2)) AS base_amount,
+       CAST(iii.tax_amount / 100.0 AS DECIMAL(15, 2)) AS tax_amount
+from bls_bills bb
+    join bls_actors ba on bb.actor_id = ba.id
+    join inv_invoices ii on ii.bill_id = bb.id
+    join inv_invoice_items iii on ii.id = iii.invoice_id
+where ba.partner_family = 'STANDARD'
+and ba.country_code = 'ES'
+AND ba.type = 'CONSOLIDATED_PARTNER'
+and bb.billing_cycle_start = '2025-06-09'
+AND bb.billing_cycle_end = '2025-06-15'
+and bb.status = 'PROCESSING'
+AND billing_cycle = 'WEEKLY'
+-- and date(bb.creation_time) = '2023-06-23'
+-- ba.external_id in (24)
