@@ -1,0 +1,32 @@
+select ba.type as actor_type,
+		bb.id,
+		bb.closed_at,
+		bbi.creation_time,
+       ba.external_id as actor_external_id,
+--       ba.store_address_external_id as store,
+--       bbi.description as description,
+--       bbi.currency as currency,
+       bbi.amount / 100 as amount,
+--       bbi.tax / 100 as tax_amount,
+       bbi.type as type,
+--       bbi.source_type,
+       bbi.source_id,
+       billing_cycle_start,
+       billing_cycle_end
+       -- boi.dispatching_time
+from bls_bill_items bbi
+    join bls_bills bb on bbi.bill_id = bb.id
+    join bls_actors ba on bb.actor_id = ba.id
+    -- join bls_orders_information boi on boi.order_id = bbi.source_id -- and bbi.source_type = 'ORDER'
+where ba.type in ('PARTNER', 'CONSOLIDATED_PARTNER')
+and ba.partner_family = 'STANDARD'
+and ba.country_code = 'ES'
+-- and bbi.bill_item_import_id is null
+-- and ba.external_id in (255161)
+and bb.status not in ('VOID')
+-- and bbi.type IN ('ORDER', 'PROMOTION','ADJUSTMENT')
+-- and bbi.type IN ('PLATFORM_FEE')
+-- and bb.closed_at BETWEEN '2024-01-01 00:00:00' AND '2024-09-30 23:59:59'
+-- ba.external_id in 
+AND bbi.source_id in (101336417699)
+-- and bbi.bill_id in ()
