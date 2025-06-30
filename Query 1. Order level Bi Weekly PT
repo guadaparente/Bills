@@ -1,0 +1,54 @@
+SELECT
+    bbi.bill_id,
+    bbi.source_id                                                                       AS order_id,
+    -- boi.order_code                                                                      AS order_code,
+    ba.external_id                                                                      AS store_address_id,
+    -- bbi.creation_time ,
+    ba.city_code,
+    ba.country_code,
+    SUM(IF(bbi.type = 'ORDER', bbi.amount, 0)) / 100.0                                  AS Products,
+    SUM(IF(bbi.type = 'ACCUMMULATED_DEBT', bbi.amount, 0)) / 100.0                                  AS Accummulated_debt,
+    SUM(IF(bbi.type = 'DELIVERY_FEE', bbi.amount, 0)) / 100.0                                  AS DF,
+    SUM(IF(bbi.type = 'PROMOTION', bbi.amount, 0)) / 100.0                              AS Promotion,
+    SUM(IF(bbi.type = 'COST_PER_ORDER_ASSUMED', bbi.amount, 0)) / 100.0            AS CPO,
+    SUM(IF(bbi.type = 'EFFECTIVE_COMMISSION', bbi.amount, 0) / 100.0)              AS Effective_commission,
+    SUM(IF(bbi.type = 'COMMISSION_PARTNER_INCIDENT', bbi.amount, 0) / 100.0)              AS COMMISSION_PARTNER_INCIDENT,
+    SUM(IF(bbi.type = 'GLOVO_BALANCE_DISCOUNT', bbi.amount, 0)) / 100.0          AS Glovo_balance_discount,
+    SUM(IF(bbi.type = 'PROMOTION_ON_DELIVERY', bbi.amount, 0)) / 100.0                  AS Promotion_on_delivery,
+    CAST(SUM(CASE WHEN bbi.type = 'GLOVO_PROMOTION_ON_DELIVERY_TAXABLE_BASE' THEN bbi.amount ELSE 0 END) / 100.0 AS DECIMAL(15, 2))            AS taxable_DF_promos,
+   -- SUM(IF(bbi.type = 'GLOVO_BALANCE_VOUCHER', bbi.amount, 0)) / 100.0                  AS Voucher,
+    SUM(IF(bbi.type = 'REFUND', bbi.amount, 0)) / 100.0                                 AS Refund,
+    SUM(IF(bbi.type = 'SANCTION', bbi.amount, 0)) / 100.0                                 AS Sanction,
+    SUM(IF(bbi.type = 'EARLY_PAYOUT_DISCOUNT', bbi.amount, 0)) / 100.0                                 AS Payout_deducted,
+    SUM(IF(bbi.type = 'INSTANT_PAYOUT_FEE', bbi.amount, 0)) / 100.0                                 AS Payout_Fee,
+    SUM(IF(bbi.type = 'ADJUSTMENT', bbi.amount, 0)) / 100.0                                 AS Adjustment,
+    SUM(IF(bbi.type in ( 'MINIMUM_BASKET_SURCHARGE', 'SURCHARGE'), bbi.amount, 0)) / 100.0                              AS Surcharge,
+    SUM(IF(bbi.type = 'PRODUCTS_PAID_IN_CASH', bbi.amount, 0)) / 100.0                  AS Products_paid_in_cash,
+    SUM(IF(bbi.type = 'GLOVO_ORDER_PARTNER_INCIDENT', bbi.amount, 0)) / 100.0                  AS Glovo_Products_partner_Incident,
+ 	SUM(IF(bbi.type = 'PRODUCTS_TO_PAY_PARTNER', bbi.amount, 0)) / 100.0                  AS Products_to_pay_partner,
+	SUM(IF(bbi.type = 'PLATFORM_FEE', bbi.amount, 0)) / 100.0                  AS Platform_fee,
+ 	SUM(IF(bbi.type = 'SALES_FEE', bbi.amount, 0)) / 100.0                  AS Sales_fee,
+ 	SUM(IF(bbi.type = 'MKT_BOOST', bbi.amount, 0)) / 100.0                  AS MKT_BOOST,
+ 	SUM(IF(bbi.type = 'GLOVO_MKT_GMO', bbi.amount, 0)) / 100.0                  AS GLOVO_MKT_GMO,
+ 	SUM(IF(bbi.type = 'GLOVO_MKT_GMO_CREDIT', bbi.amount, 0)) / 100.0                  AS GLOVO_MKT_GMO_CREDIT,
+ 	SUM(IF(bbi.type = 'MKT_ACTIONS', bbi.amount, 0)) / 100.0                  AS MKT_ACTIONS,
+ 	SUM(IF(bbi.type = 'MKT_BUBBLE', bbi.amount, 0)) / 100.0                  AS MKT_BUBBLE,
+ 	SUM(IF(bbi.type = 'MKT_POSITIONING', bbi.amount, 0)) / 100.0                  AS MKT_POSITIONING,
+	SUM(IF(bbi.type = 'MKT_SEARCH', bbi.amount, 0)) / 100.0                  AS MKT_SEARCH,
+	SUM(IF(bbi.type = 'MKT_KEYWORDS', bbi.amount, 0)) / 100.0                  AS MKT_KEYWORDS,
+	SUM(IF(bbi.type = 'MKT_DFP', bbi.amount, 0)) / 100.0                  AS MKT_DFP,
+	SUM(IF(bbi.type = 'MKT_CRM', bbi.amount, 0)) / 100.0                  AS MKT_CRM,
+	SUM(IF(bbi.type = 'MKT_OTHER', bbi.amount, 0)) / 100.0                  AS MKT_OTHER,
+	CAST(SUM(CASE WHEN bbi.type = 'PARTNER_WAIT_TIME_FEE_TAXABLE_BASE' THEN bbi.amount ELSE 0 END) / 100.0 AS DECIMAL(15, 2))                        AS Wait_time_fees,
+ABS(SUM(IF(bbi.type IN ('COST_PER_ORDER_ASSUMED','EFFECTIVE_COMMISSION', 'GLOVO_BALANCE_DISCOUNT', 'COMMISSION'),
+        bbi.amount, 0))) / 100.0                                                       AS Partner_Commission
+FROM
+    bls_bill_items     bbi
+        JOIN bls_bills bb ON bbi.bill_id = bb.id
+        JOIN bls_actors ba ON bb.actor_id = ba.id
+WHERE
+ba.partner_family in ('STANDARD','BURGERKING')
+and ba.billing_cycle = 'WEEKLY'
+and country_code = 'PT'
+and date(bb.processing_date) = '2025-06-15'
+GROUP BY 1,2,3,4,5;
