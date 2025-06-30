@@ -1,0 +1,7 @@
+SELECT 
+external_id, partner_family, billing_cycle
+FROM bls_actors
+WHERE partner_family = 'STANDARD'
+AND billing_cycle = 'WEEKLY'
+AND country_code = 'ES'
+AND type = 'PARTNER'
