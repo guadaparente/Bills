@@ -1,0 +1,24 @@
+select ba.type as actor_type,
+		bb.id,
+		bb.closed_at,
+		bbi.creation_time,
+       ba.external_id as actor_external_id,
+       bbi.description as description,
+       bbi.currency as currency,
+       bbi.amount / 100 as amount,
+       bbi.tax / 100 as tax_amount,
+       bbi.type as type,
+       bbi.source_type,
+       bbi.source_id
+       -- boi.dispatching_time
+from bls_bill_items bbi
+    join bls_bills bb on bbi.bill_id = bb.id
+    join bls_actors ba on bb.actor_id = ba.id
+    -- join bls_orders_information boi on boi.order_id = bbi.source_id -- and bbi.source_type = 'ORDER'
+where ba.type IN ('PARTNER','CONSOLIDATED_PARTNER')
+-- and bbi.TYPE in ('PRODUCTS_TO_PAY_PARTNER')
+-- and bbi.bill_item_import_id is null
+-- and ba.external_id in (161609)
+and bbi.source_id in (101346831429)
+-- and bbi.bill_id in ()
+-- and date(bbi.creation_time) BETWEEN '2022-03-28' and '2022-03-31'
