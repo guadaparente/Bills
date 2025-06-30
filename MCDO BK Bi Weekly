@@ -1,0 +1,19 @@
+SELECT DISTINCT 
+    ba.external_id,
+    ba.partner_family,
+    billing_cycle,
+    (name),
+    partner_tax
+    
+FROM 
+    bls_actors ba
+JOIN 
+    bls_bills bb ON ba.id = bb.actor_id
+JOIN 
+    bls_cities bc ON ba.city_code = bc.city_code
+
+WHERE
+    ba.partner_family IN ('BURGERKING','MCDONALDS','NOT_INVOICED')
+--   and billing_cycle IN ('WEEKLY')
+AND ba.type = 'PARTNER'
+AND ba.country_code = 'ES'
