@@ -1,0 +1,51 @@
+-- QUERY 2 --
+
+SELECT
+    ba.external_id AS store_address_id,
+    bb.id AS bill_id,
+    ba.type,
+    SUM(CASE WHEN iii.concept = 'ACCUMULATED_DEBT' THEN iii.base_amount / 100 ELSE 0 END) AS ACCUMULATED_DEBT,
+    SUM(CASE WHEN iii.concept = 'COST_OF_INCIDENTS' THEN iii.base_amount / 100 ELSE 0 END) AS COST_OF_INCIDENTS,
+    SUM(CASE WHEN iii.concept = 'COURIER_ACCESS_FEE' THEN iii.base_amount / 100 ELSE 0 END) AS COURIER_ACCESS_FEE,
+    SUM(CASE WHEN iii.concept = 'COURIER_ACCESS_FEE_BALANCE' THEN iii.base_amount / 100 ELSE 0 END) AS COURIER_ACCESS_FEE_BALANCE,
+    SUM(CASE WHEN iii.concept = 'DELIVERY_FEE_PROMOTION_ASSUMED' THEN iii.base_amount / 100 ELSE 0 END) AS DELIVERY_FEE_PROMOTION_ASSUMED,
+    SUM(CASE WHEN iii.concept = 'DELIVERY_FEE_TO_CHARGE_PARTNER' THEN iii.base_amount / 100 ELSE 0 END) AS DELIVERY_FEE_TO_CHARGE_PARTNER,
+    SUM(CASE WHEN iii.concept = 'DISCOUNT' THEN iii.base_amount / 100 ELSE 0 END) AS DISCOUNT,
+    SUM(CASE WHEN iii.concept = 'EARLY_PAYOUT_CONVENIENCE_FEE' THEN iii.base_amount / 100 ELSE 0 END) AS EARLY_PAYOUT_CONVENIENCE_FEE,
+    SUM(CASE WHEN iii.concept = 'EARLY_PAYOUT_DISCOUNT' THEN iii.base_amount / 100 ELSE 0 END) AS EARLY_PAYOUT_DISCOUNT,
+    SUM(CASE WHEN iii.concept = 'GLOVO_ALREADY_PAID' THEN iii.base_amount / 100 ELSE 0 END) AS GLOVO_ALREADY_PAID,
+    SUM(CASE WHEN iii.concept = 'INVOICE_BALANCE' THEN iii.base_amount / 100 ELSE 0 END) AS INVOICE_BALANCE,
+    SUM(CASE WHEN iii.concept = 'MARKETING_PROMOTION' THEN iii.base_amount / 100 ELSE 0 END) AS MARKETING_PROMOTION,
+    SUM(CASE WHEN iii.concept = 'PARTNER_INVOICE_DELIVERY_FEES' THEN iii.base_amount / 100 ELSE 0 END) AS PARTNER_INVOICE_DELIVERY_FEES,
+    SUM(CASE WHEN iii.concept = 'PARTNER_WAIT_TIME_FEES' THEN iii.base_amount / 100 ELSE 0 END) AS PARTNER_WAIT_TIME_FEES,
+    SUM(CASE WHEN iii.concept = 'PARTNERSHIP_FEE' THEN iii.base_amount / 100 ELSE 0 END) AS PARTNERSHIP_FEE,
+    SUM(CASE WHEN iii.concept = 'PLATFORM_FEE' THEN iii.base_amount / 100 ELSE 0 END) AS PLATFORM_FEE,
+    SUM(CASE WHEN iii.concept = 'PRODUCTS' THEN iii.base_amount / 100 ELSE 0 END) AS PRODUCTS,
+    SUM(CASE WHEN iii.concept = 'PRODUCTS_PARTNER_INCIDENT' THEN iii.base_amount / 100 ELSE 0 END) AS PRODUCTS_PARTNER_INCIDENT,
+    SUM(CASE WHEN iii.concept = 'PRODUCTS_TO_PAY_FOR_INCIDENTS' THEN iii.base_amount / 100 ELSE 0 END) AS PRODUCTS_TO_PAY_FOR_INCIDENTS,
+    SUM(CASE WHEN iii.concept = 'PROMOTION_ASSUMED_BY_PARTNER' THEN iii.base_amount / 100 ELSE 0 END) AS PROMOTION_ASSUMED_BY_PARTNER,
+    SUM(CASE WHEN iii.concept = 'SALES_FEE' THEN iii.base_amount / 100 ELSE 0 END) AS SALES_FEE,
+    SUM(CASE WHEN iii.concept = 'SANCTIONS' THEN iii.base_amount / 100 ELSE 0 END) AS SANCTIONS,
+    SUM(CASE WHEN iii.concept = 'TAXABLE_BASE' THEN iii.base_amount / 100 ELSE 0 END) AS TAXABLE_BASE,
+    SUM(CASE WHEN iii.concept = 'TAX_AMOUNT' THEN iii.tax_amount / 100 ELSE 0 END) AS TAX_AMOUNT,
+    SUM(CASE WHEN iii.concept = 'TOTAL_INVOICE' THEN iii.base_amount / 100 ELSE 0 END) AS TOTAL_INVOICE,
+    SUM(CASE WHEN iii.concept = 'TOTAL_PAYABLE' THEN iii.base_amount / 100 ELSE 0 END) AS TOTAL_PAYABLE,
+    SUM(CASE WHEN iii.concept = 'VOUCHER' THEN iii.base_amount / 100 ELSE 0 END) AS VOUCHER
+FROM
+    bls_bills bb
+JOIN
+    bls_actors ba ON bb.actor_id = ba.id
+JOIN
+    inv_invoices ii ON ii.bill_id = bb.id
+JOIN
+    inv_invoice_items iii ON ii.id = iii.invoice_id
+WHERE
+    ba.partner_family = 'STANDARD'
+    AND ba.country_code = 'ES'
+    AND ba.type = 'PARTNER'
+-- AND ba.external_id IN (
+    AND bb.billing_cycle_start = '2025-05-16'
+    AND bb.billing_cycle_end = '2025-05-31'
+    AND bb.status NOT IN ('VOID')
+GROUP BY
+    ba.external_id, bb.id;
