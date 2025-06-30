@@ -1,0 +1,33 @@
+select ba.type as actor_type,
+		bb.id,
+		bb.closed_at,
+		bbi.creation_time,
+		bb.processing_date,
+		ba.external_id as actor_external_id,    
+--       ba.store_address_external_id as store,
+--       bbi.description as description,
+--       bbi.currency as currency,
+       bbi.amount / 100 as amount,
+       bbi.tax / 100 as tax_amount,
+       bbi.type as type,
+--       bbi.source_type,
+       bbi.source_id,
+       billing_cycle_start,
+       billing_cycle_end
+       -- boi.dispatching_time
+from bls_bill_items bbi
+    join bls_bills bb on bbi.bill_id = bb.id
+    join bls_actors ba on bb.actor_id = ba.id
+    -- join bls_orders_information boi on boi.order_id = bbi.source_id -- and bbi.source_type = 'ORDER'
+where ba.type in ('PARTNER', 'CONSOLIDATED_PARTNER')
+and ba.partner_family = 'STANDARD'
+and ba.country_code = 'ES'
+-- and bbi.bill_item_import_id is null
+-- and ba.external_id in (255161)
+and bb.status not in ('VOID')
+and bb.status = 'PROCESSING'
+-- and bbi.type IN ('ORDER', 'PROMOTION','ADJUSTMENT')
+-- and bb.closed_at BETWEEN '2024-01-01 00:00:00' AND '2024-09-30 23:59:59'
+-- and ba.external_id in ()
+ and bbi.source_id in (101147225856,101147093537,101142827125,101141954950,101142955222,101141967051,101142759677,101142891798,101142197082,101143184780,101143054445,101143051204,101142922283,101147230780,101147037658,101146966475,101147358278,101147167590,101158076760,101158089332,101145288662,101145212096,101144207521,101145352028,101145195150,101147242887,101146158804,101147217514,101146780874,101147282065,101147415777,101143980176,101145233995,101144024937,101145208983,101145271019,101145229522,101144951570,101144141031,101143906168,101144805737,101158091077,101142994814,101142718323,101143175592,101142071978,101142900353,101142243478,101142252939,101142668774)
+-- and bbi.bill_id in (101147225856)
