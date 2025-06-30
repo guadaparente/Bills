@@ -1,0 +1,23 @@
+SELECT DISTINCT ii.serial_number as invoice_id,
+-- bb.id as bill_id,
+ba.external_id as store_address_id,
+iii.concept,(iii.base_amount/100) as base_amount,
+-- (iii.tax_amount/100) as tax_amount ,
+REPLACE(LEFT(ii.invoice_date, 19), 'T', ' ') as invoice_date,
+-- bb.processing_date,
+-- bb.processing_at
+ifd.tax_id
+from bls_bills bb
+join bls_actors ba on bb.actor_id = ba.id
+join inv_invoices ii on ii.bill_id = bb.id
+join inv_invoice_items iii on ii.id = iii.invoice_id
+join inv_fiscal_details ifd on ba.external_id = ifd.actor_external_id
+where ba.partner_family = 'STANDARD'
+and ifd.actor_type = 'PARTNER'
+and ba.country_code = 'ES'
+-- AND ifd.tax_id = 'B88617360'
+and concept in ('TOTAL_PAYABLE')
+-- and base_amount <> 0.00
+and ba.external_id in (597030,654308,671376,762918,801747,808573,811738,820304,820314,825362,832172,838071,841727,846898,847183,847679)
+-- and ii.serial_number in ('ES-PF-X6AAZN9-005/22')
+-- and bb.closed_at BETWEEN '2024-09-30 00:00:00' AND '2024-10-31 23:59:59';
